@@ -4,7 +4,7 @@ from . import web
 
 @web.route('/')
 def index():
-   pass
+   return 'main'
 
 @web.route('/personal/')
 def personal_center():
