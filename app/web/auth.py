@@ -12,16 +12,17 @@ __author__ = '七月'
 def register():
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = User()
-        user.set_attrs(form.data)
-        db.session.add(user)
-        db.session.commit()
+        with db.auto_commit():
+            user = User()
+            user.set_attrs(form.data)
+            db.session.add(user)
+            # db.session.commit()
         return redirect(url_for('web.login'))
     return render_template('auth/register.html',form=form)
 
 @web.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm (request.form)
+    form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
