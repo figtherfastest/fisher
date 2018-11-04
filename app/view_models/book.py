@@ -5,11 +5,12 @@ class BookViewModel:
         self.author = '、'.join(book['author']),
         self.publisher = book['publisher'],
         self.image = book['image'],
-        # self.image = book.image[0].large,
         self.price = book['price'],
         self.summary = book['summary'],
         self.pages = book['pages'],
-        self.isbn = book['isbn']
+        self.isbn = book['isbn'],
+        self.pubdate = book['pubdate'],
+        self.binding = book['binding']
 
     def intro(self):
         intro = filter(lambda x: True if x else False,
