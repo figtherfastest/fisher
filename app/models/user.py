@@ -1,14 +1,15 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float
 
 from app.lib.helper import is_isbn_or_key
-from app.models.base import Base
+from app.models.base import Base, db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login_manager
 from app.models.gift import Gift
 from app.models.wish import Wish
 from app.spider.yushu_book import YuShuBook
-
+from itsdangerous import TimedJSONWebSignatureSerializer as  serializer
+from flask import current_app
 
 class User(UserMixin, Base):
     id = Column(Integer, primary_key=True)
@@ -47,6 +48,26 @@ class User(UserMixin, Base):
             return True
         else:
             return False
+
+    def generate_token(self,expiration=600):
+        s = serializer(current_app.config['SECURE_KEY'],expiration)
+        return s.dump({'id':self.id}).decode('utf-8')
+
+
+    @staticmethod
+    def reset_password(token,new_password):
+        s = serializer(current_app.config['SECURE_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return False
+        uid = data.get('id')
+        with db.auto_commit():
+            user = User.query.get(uid)
+            user.password = new_password
+        return True
+
+
 
 @login_manager.user_loader
 def get_user(uid):
