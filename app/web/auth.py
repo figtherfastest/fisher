@@ -51,6 +51,7 @@ def forget_password_request():
                       user=user,
                       tokrn=user.generate_token()
                       )
+            flash('一份邮件已成功发送')
             # try:
             #     user = User.query.filter_by(email=account_email).first_or_404()
             # except Exception as e:
@@ -68,7 +69,6 @@ def forget_password(token):
             return redirect(url_for('web.login'))
         else:
             flash('shibai')
-
     return render_template('auth/forget_password.html', form=form)
 
 
