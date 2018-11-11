@@ -13,6 +13,9 @@ class Gift(db.Model):
     isbn = Column(String(15), nullable=False)
     launched = Column(Boolean, default=False)
 
+    def is_yourself_gift(self,uid):
+        return True if self.uid == uid else False
+
     @classmethod
     def get_user_gifts(cls,uid):
         gifts = Gift.query.filter_by(uid=uid,launche=False).order_by(

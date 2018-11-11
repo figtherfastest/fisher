@@ -1,5 +1,8 @@
+from math import floor
+
 from sqlalchemy import Column, Integer, String, Boolean, Float
 
+from app.lib.enums import PendingStatus
 from app.lib.helper import is_isbn_or_key
 from app.models.base import Base, db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,6 +13,9 @@ from app.models.wish import Wish
 from app.spider.yushu_book import YuShuBook
 from itsdangerous import TimedJSONWebSignatureSerializer as  serializer
 from flask import current_app
+
+from app.web.drift import pending
+
 
 class User(UserMixin, Base):
     id = Column(Integer, primary_key=True)
@@ -23,6 +29,24 @@ class User(UserMixin, Base):
     _password = Column('password', String(128), nullable=False)
     wx_open_id = Column(String(50))
     wx_name = Column(String(32))
+
+
+    def can_send_drift(self):
+        if self.beans < 1:
+            return False
+        success_gifts_count = Gift.query.filter(uid == self.id,launched=True).count()
+        success_receive_count = Gift.query.filter(pending == PendingStatus.success,
+                                             requester_id == self.id).count()
+        return True if floor(success_receive_count/2) <= floor(success_gifts_count - 2) else False
+
+    @property
+    def summary(self):
+        return dict(
+            nickname=self.nickname,
+            beans=self.beans,
+            email=self.email,
+            send_receive=str(self.send_counter) + '/' + str(self.receive_counter)
+        )
 
     @property
     def password(self):
