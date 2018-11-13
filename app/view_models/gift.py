@@ -31,7 +31,7 @@ class MyGifts:
             'id':gift.id
         }
         return r
-        # my_gift = MyGift(gift.id,BookViewModel(gift.book),count)
+        # my_gift = MyGift(gif t.id,BookViewModel(gift.book),count)
         # return my_gift
 
 

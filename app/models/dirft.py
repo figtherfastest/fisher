@@ -1,6 +1,8 @@
 
 from sqlalchemy import Column, String, Integer, ForeignKey, SmallInteger
 from sqlalchemy.orm import relationship
+
+from app.lib.enums import PendingStatus
 from app.models.base import Base
 
 
@@ -22,6 +24,15 @@ class Drift:
     gifter_id = Column(Integer)
     gift_id = Column(Integer)
     gifter_nickname = Column(String(20))
-    # _pending = Column('pending', SmallInteger, default=1)
+    _pending = Column('pending', SmallInteger, default=1)
+
+    @property
+    def pending(self):
+        return PendingStatus(self._pending)
+    @pending.setter
+    def panding(self,status):
+        self._pending = status.value
+
+
     # gift_id = Column(Integer, ForeignKey('gift.id'))
     # gift = relationship('Gift')
