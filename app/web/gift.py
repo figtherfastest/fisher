@@ -1,6 +1,7 @@
 from flask import current_app, flash, redirect, url_for, render_template
 
 from app.models.base import db
+from app.models.dirft import Drift
 from app.models.gift import Gift
 from app.view_models.gift import MyGifts
 from app.view_models.trade import MyTrades
@@ -40,5 +41,16 @@ def save_to_gifts(isbn):
 
 
 @web.route('/gifts/<gid>/redraw')
+@login_required
 def redraw_from_gifts(gid):
-    pass
+    gift = Gift.query.filter_by(id=gid,launched=False).first_or_404()
+    drift = Drift.query.filter_by(
+        gift_id=gid,pending=PendingState.Waiting
+    ).first()
+    if drift:
+        flash('111111')
+    else:
+        with db.auto_commit():
+            current_user.beans += current_app.config['BEANS_UPLOAD_ONE_BOOK']
+            gift.delete()
+    return redirect(url_for('web.my_gifts'))
